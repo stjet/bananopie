@@ -1,7 +1,12 @@
 # Bananopie
+
 Bananopie is a python library for the Banano cryptocurrency. It aims to be the python equivalent of Banano.js, and not just a RPC wrapper (Sending, receiving, changing rep functions are very high level).
 
 ## Installation
+
+`pip install bananopie`
+
+Bananopie is on [pypi](https://pypi.org/project/bananopie/).
 
 # Quick Start
 
@@ -55,8 +60,11 @@ Utility functions are also provided.
 ```py
 import bananopie
 
-#raw to whole banano
+#whole to raw banano
 print(bananopie.whole_to_raw(492.2))
+
+#raw to whole banano
+print(bananopie.raw_to_whole(1900000000000000000000000000))
 ```
 
 # Documentation
