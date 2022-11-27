@@ -70,7 +70,7 @@ def get_private_key_from_seed(seed, seed_index):
   #https://docs.nano.org/glossary/#wallet
   #seed_index is 32 bit (4 bytes)
   #use hashlib blake2b
-  seed_index = seed_index.to_bytes(4, 'little')
+  seed_index = seed_index.to_bytes(4, 'big')
   seed = hex_to_bytes(seed)
   blake_obj = blake2b(digest_size=32)
   blake_obj.update(seed)

@@ -14,7 +14,7 @@ class Wallet:
   def generate_seed():
     return bytes_to_hex(random_bytes(32))
   def get_address(self):
-    return get_address_from_public_key(get_public_key_from_private_key(get_private_key_from_seed(self.seed, 0)))
+    return get_address_from_public_key(get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index)))
   def send_process(self, block, subtype: str):
     payload = {
       "action": "process",
@@ -29,8 +29,8 @@ class Wallet:
   def send(self, to: str, amount: int, work = False):
     amount = whole_to_raw(amount)
     address_sender = self.get_address()
-    private_key_sender = get_private_key_from_seed(self.seed, 0)
-    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, 0))
+    private_key_sender = get_private_key_from_seed(self.seed, self.index)
+    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
     public_key_receiver = get_public_key_from_address(to)
     info = self.get_account_info()
     previous = info["frontier"]
@@ -42,7 +42,7 @@ class Wallet:
       "account": address_sender,
       "previous": previous,
       "representative": representative,
-      "balance": str(int(before_balance)-amount),
+      "balance": str(int(int(before_balance)-amount)),
       #link in this case is public key of account to send to
       "link": public_key_receiver,
       "link_as_account": to
@@ -59,8 +59,8 @@ class Wallet:
     block_info = self.rpc.get_block_info(hash)
     amount = int(block_info["amount"])
     address_sender = self.get_address()
-    private_key_receiver = get_private_key_from_seed(self.seed, 0)
-    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, 0))
+    private_key_receiver = get_private_key_from_seed(self.seed, self.index)
+    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
     public_key_sender = get_public_key_from_address(block_info["block_account"])
     #these are the defaults, if the account is unopened
     before_balance = 0
@@ -98,8 +98,8 @@ class Wallet:
       self.receive_specific(block_hash)
   def change_rep(self, new_representative, work=False):
     address_self = self.get_address()
-    private_key_self = get_private_key_from_seed(self.seed, 0)
-    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, 0))
+    private_key_self = get_private_key_from_seed(self.seed, self.index)
+    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
     #these are the defaults, if the account is unopened
     before_balance = 0
     previous = "0000000000000000000000000000000000000000000000000000000000000000"

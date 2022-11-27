@@ -47,4 +47,10 @@ print(my_account.change_rep("ban_3catgir1p6b1edo5trp7fdb8gsxx4y5ffshbphj73zzy5hu
 #change rep
 
 #change seed index
-my_account.index = 2
+my_account.index = 1
+
+assert my_account.get_address() == "ban_1rgkz7ipqntii8ic9j411agmtf6do3nxseey3x4jhrqsjcoitj3g9zgi9f53"
+
+print(my_account.receive_all())
+
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", 0.01))
