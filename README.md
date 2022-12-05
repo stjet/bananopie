@@ -16,7 +16,7 @@ from bananopie import *
 rpc = RPC("https://kaliumapi.appditto.com/api")
 
 #check current blockcount
-print(rpc.get_block_count().count)
+print(rpc.get_block_count()["count"])
 
 #get last 10 transactions of JungleTV
 print(rpc.get_account_history("ban_1jung1eb3uomk1gsx7w6w7toqrikxm5pgn5wbsg5fpy96ckpdf6wmiuuzpca", count=10)["history"])
