@@ -14,7 +14,7 @@ print(rpc.get_account_history("ban_1jung1eb3uomk1gsx7w6w7toqrikxm5pgn5wbsg5fpy96
 #check balance of JungleTV
 print(raw_to_whole(int(rpc.get_account_balance("ban_1jung1eb3uomk1gsx7w6w7toqrikxm5pgn5wbsg5fpy96ckpdf6wmiuuzpca")["balance"])))
 
-assert whole_to_raw(492.2) == 4.922e+31
+assert whole_to_raw("492.2") == 49220000000000000000000000000000
 assert raw_to_whole(15*(10**BANANO_DECIMALS)) == 15.0
 
 #if someone drains the funds in this test seed I will be very upset >:(
@@ -38,7 +38,7 @@ print(my_account.receive_all())
 
 #send 1 banano to the faucet development fund
 print("Send test")
-print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", 1))
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.1"))
 
 #receive funds
 print("Change test")
@@ -53,4 +53,4 @@ assert my_account.get_address() == "ban_1rgkz7ipqntii8ic9j411agmtf6do3nxseey3x4j
 
 print(my_account.receive_all())
 
-print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", 0.01))
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.0040000501"))

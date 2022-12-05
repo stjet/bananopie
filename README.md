@@ -44,7 +44,7 @@ print(my_account.get_address())
 print(my_account.get_balance())
 
 #send 1 banano to the faucet development fund
-print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", 1))
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1"))
 
 #receive funds
 my_account.receive_all()
@@ -61,7 +61,7 @@ Utility functions are also provided.
 import bananopie
 
 #whole to raw banano
-print(bananopie.whole_to_raw(492.2))
+print(bananopie.whole_to_raw("492.2"))
 
 #raw to whole banano
 print(bananopie.raw_to_whole(1900000000000000000000000000))
@@ -256,13 +256,13 @@ High level function to send Banano
 
 **Parameters**
 - `to` (*str*): Address to send to
-- `amount` (*int*): Amount of Banano to send (in whole, not raw)
+- `amount` (*str*): Amount of Banano to send (in whole, not raw)
 - `work` (*str* or *bool*, Default: False): Leave it as False to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
 
 Sample:
 ```py
 my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
-my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", 1)
+my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1")
 ```
 
 **Returns**
@@ -358,7 +358,7 @@ print(Wallet.generate_seed())
 Converts whole Banano to raw Banano
 
 **Parameters**
-- `whole` (*int*): Whole amount of Banano
+- `whole` (*str*): Whole amount of Banano
 
 **Returns**
 *int*, that is raw amount of Banano

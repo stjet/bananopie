@@ -26,7 +26,7 @@ class Wallet:
       payload["do_work"] = True
     return self.rpc.call(payload)
   #actions
-  def send(self, to: str, amount: int, work = False):
+  def send(self, to: str, amount: str, work = False):
     amount = whole_to_raw(amount)
     address_sender = self.get_address()
     private_key_sender = get_private_key_from_seed(self.seed, self.index)

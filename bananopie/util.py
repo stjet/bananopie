@@ -1,9 +1,11 @@
 import os, math
 from hashlib import blake2b
-#holy shit! this library sucks
 import ed25519_blake2b
+from decimal import Decimal, getcontext
 
 BANANO_DECIMALS = 29
+#banano supply is 1.000.000.000+, so add 10 decimals
+getcontext().prec = BANANO_DECIMALS+10
 PREAMBLE = "0000000000000000000000000000000000000000000000000000000000000006"
 
 #this function translated to python from https://nanoo.tools/js/termhn_nano-base32_2018-03-06.js
@@ -115,8 +117,8 @@ def sign(private_key, hash):
   sign = bytes_to_hex(signing_key.sign(hex_to_bytes(hash)))
   return sign
 
-def whole_to_raw(whole):
-  return whole*(10**BANANO_DECIMALS)
+def whole_to_raw(whole: str):
+  return int(Decimal(whole)*(10**BANANO_DECIMALS))
 
 def raw_to_whole(raw):
   return math.floor((raw*100)/(10**BANANO_DECIMALS))/100
