@@ -56,6 +56,18 @@ my_account.change_rep("ban_3catgir1p6b1edo5trp7fdb8gsxx4y5ffshbphj73zzy5hu678rsr
 my_account.index = 2
 ```
 
+Bananopie can also generate work, albeit slowly. This is useful when using node that don't support generating work. Also, the `legacy` parameter can be passed to the RPC class when the RPC supports the deprecated `pending` RPC call instead of the newer `receivable` call.
+```py
+from bananopie import RPC, Wallet
+
+no_work_rpc = RPC("https://public.node.jungletv.live/rpc", legacy=True)
+
+my_work_account = Wallet(no_work_rpc, seed="seed here", index=0, try_work=True)
+
+#will generate work locally!
+my_work_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.0042")
+```
+
 Utility functions are also provided.
 ```py
 import bananopie
@@ -75,6 +87,7 @@ Also see the [Nano RPC docs](https://docs.nano.org/commands/rpc-protocol) for in
 **Parameters:**
 - `rpc_url` (*str*): IP or URL of node
 - `auth` (*str* or *bool*, Default: False): Optional HTTP Authorization header
+- `legacy` (*bool*, Default: False): If `True`, will use 'pending' instead of 'receivable'
 
 Sample:
 ```py
@@ -228,6 +241,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#receivable)
 - `rpc` (*RPC*): A RPC class
 - `seed` (*str* or *bool*, Default: False): 64 character hex seed, if `False`, will generate a seed by itself. Private keys are derived from the seed.
 - `index` (*int*, Default: 0): Optional parameter that is the index of the seed. Any number from 0 to 4294967295. Each index of the seed is a different private key, and so different address.
+- `try_work` (*bool*, Default: False): If `True`, will try to generate work locally instead of asking node for work (and no work provided). Good to use if node does not support generating own work.
 
 Sample:
 ```py
@@ -257,7 +271,7 @@ High level function to send Banano
 **Parameters**
 - `to` (*str*): Address to send to
 - `amount` (*str*): Amount of Banano to send (in whole, not raw)
-- `work` (*str* or *bool*, Default: False): Leave it as False to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
 
 Sample:
 ```py
@@ -273,7 +287,7 @@ Receive a specific block
 
 **Parameters**
 - `hash` (*str*): Block hash to receive
-- `work` (*str* or *bool*, Default: False): Leave it as False to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
 
 **Returns**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process)
@@ -349,6 +363,7 @@ print(Wallet.generate_seed())
 **Properties**
 - `BANANO_DECIMALS` (*int*): Amount of decimals that Banano has (29)
 - `PREAMBLE` (*str*): Hex string to prepend when signing
+- `BANANO_WORK` (*str*): Hex string of Banano's work threshold/minimum
 
 **Methods**
 
@@ -371,3 +386,51 @@ Converts raw Banano to whole Banano (Cuts off at 2 decimal places)
 
 **Returns**
 *int*, that is whole amount of Banano
+
+### raw_to_whole_no_round (Function)
+Converts raw Banano to whole Banano, without rounding
+
+**Parameters**
+- `raw` (*int*): Raw amount of Banano
+
+**Returns**
+*str*, that is unrounded whole amount of Banano
+
+### gen_work_random (Function)
+Generate work given block's previous hash (or if opening block, account public key), and threshold. Generates work using psuedorandom generator.
+
+**Parameters**
+- `hash` (*str*): Hex previous hash of block / account public key
+- `threshold` (*str*): Hex minimum work threshold
+
+**Returns**
+*str*, that is hex of work
+
+### gen_work_deterministic (Function)
+Generate work given block's previous hash (or if opening block, account public key), and threshold. Generates work deterministically.
+
+**Parameters**
+- `hash` (*str*): Hex previous hash of block / account public key
+- `threshold` (*str*): Hex minimum work threshold
+
+**Returns**
+*str*, that is hex of work
+
+### gen_work (Function)
+Generate work given block's previous hash (or if opening block, account public key). Basically a wrapper for `gen_work_deterministic` with threshold being the hardcoded Banano default.
+
+**Parameters**
+- `hash` (*str*): Hex previous hash of block / account public key
+
+**Returns**
+*str*, that is hex of work
+
+### verify_work (Function)
+Verify whether work is valid or not, given previous hash of block (or if opening block, account public key).
+
+**Parameters**
+- `hash` (*str*): Hex previous hash of block / account public key
+- `work` (*str*): Hex of work
+
+**Returns**
+*bool*, whether the work is valid or not

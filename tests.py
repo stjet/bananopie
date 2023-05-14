@@ -1,6 +1,5 @@
 from bananopie import *
-
-#todo: change tests so they use ` ]`
+#import time
 
 rpc = RPC("https://kaliumapi.appditto.com/api")
 
@@ -54,3 +53,18 @@ assert my_account.get_address() == "ban_1rgkz7ipqntii8ic9j411agmtf6do3nxseey3x4j
 print(my_account.receive_all())
 
 print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.0040000501"))
+
+#generate work test
+no_work_rpc = RPC("https://public.node.jungletv.live/rpc", legacy=True)
+
+#print(no_work_rpc.get_receivable("ban_1mayorbance1ot1sburnedbananas11111111111111111111111zsqrpxj1", count = 1))
+
+#gen_work
+
+assert verify_work("C6A3732E65800203CE0F32DE710CC110A0CA93C0080F5F0C84A352978DB285F9", "58C5C876832364CC") == True
+
+my_work_account = Wallet(no_work_rpc, seed="3AB019DFCBA0B3763A75B8717EE7900911C7DD4E3B6E31FAE8906EDA71521C98", index=0, try_work=True)
+
+my_work_account.receive_all()
+
+my_work_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.0145")
