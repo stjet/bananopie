@@ -323,6 +323,33 @@ my_account.change_rep("ban_3catgir1p6b1edo5trp7fdb8gsxx4y5ffshbphj73zzy5hu678rsr
 **Returns**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process)
 
+### sign_message (Function)
+Sign utf-8 message with private key at current index of current seed
+
+**Parameters**
+- `message` (*str*): utf-8 message to sign
+
+**Returns**
+*str*, Hex signature
+
+### sign_message_dummy_block (Function)
+Sign utf-8 message as a dummy block (making sure ledger devices can also sign) with private key at current index of current seed
+
+**Parameters**
+- `message` (*str*): utf-8 message to sign
+
+**Returns**
+*str*, Hex signature
+
+### get_public_key (Function)
+Get public key at current index of current seed
+
+**Parameters**
+None
+
+**Returns**
+*str*, Hex public key
+
 ### get_address (Function)
 Get address at current index of current seed
 
@@ -367,7 +394,29 @@ print(Wallet.generate_seed())
 
 **Methods**
 
-`encode_base32`, `decode_base32`, `bytes_to_hex`, `hex_to_bytes`, `random_bytes`, `get_private_key_from_seed`, `get_public_key_from_private_key`, `get_address_from_public_key`, `get_public_key_from_address`, `hash_block`, `sign` are internal use Functions that are currently undocumented. Look at `/bananopie/util.py` to see what they do.
+`encode_base32`, `decode_base32`, `bytes_to_hex`, `hex_to_bytes`, `utf8_to_bytes`, `random_bytes`, `get_private_key_from_seed`, `get_public_key_from_private_key`, `get_address_from_public_key`, `get_public_key_from_address`, `hash_block`, `sign`, `sign_message_dummy_block`, `gen_dummy_block_hash` are internal use Functions that are currently undocumented. Look at `/bananopie/util.py` to see what they do.
+
+### verify_message (Function)
+Verifies whether signed message is real
+
+**Parameters**
+- `public_key` (*str*): Hex public key
+- `signature` (*str*): Hex signature
+- `claimed_message` (*str*): utf-8 message that was allegedly signed
+
+**Returns**
+*bool*, `True` if message verified, `False` if message not verified
+
+### verify_message_dummy_block (Function)
+Verifies whether signed message (with dummy block) is real
+
+**Parameters**
+- `public_key` (*str*): Hex public key
+- `signature` (*str*): Hex signature
+- `claimed_message` (*str*): utf-8 message (with dummy block) that was allegedly signed
+
+**Returns**
+*bool*, `True` if message (with dummy block) verified, `False` if message (with dummy block) not verified
 
 ### whole_to_raw (Function)
 Converts whole Banano to raw Banano

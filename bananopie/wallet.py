@@ -14,8 +14,10 @@ class Wallet:
   @staticmethod
   def generate_seed():
     return bytes_to_hex(random_bytes(32))
-  def get_address(self):
-    return get_address_from_public_key(get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index)))
+  def get_public_key(self) -> str:
+    return get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
+  def get_address(self) -> str:
+    return get_address_from_public_key(self.get_public_key())
   def send_process(self, block, subtype: str):
     payload = {
       "action": "process",
@@ -27,7 +29,7 @@ class Wallet:
       if self.try_work:
         #if opening block, there is no previous, so use public key as hash instead
         if block["previous"] == "0000000000000000000000000000000000000000000000000000000000000000":
-          block["work"] = gen_work(get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index)))
+          block["work"] = gen_work(self.get_public_key())
         else:
           block["work"] = gen_work(block["previous"])
       else:
@@ -134,6 +136,12 @@ class Wallet:
     if work:
       block["work"] = work
     return self.send_process(block, "change")
+  def sign_message(self, message: str) -> str:
+    private_key_self = get_private_key_from_seed(self.seed, self.index)
+    return sign_message(private_key_self, message)
+  def sign_message_dummy_block(self, message: str) -> str:
+    private_key_self = get_private_key_from_seed(self.seed, self.index)
+    return sign_message_dummy_block(private_key_self, message)
   #double wrapped
   def get_balance(self):
     return self.rpc.get_account_balance(self.get_address())

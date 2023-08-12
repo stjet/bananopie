@@ -10,6 +10,8 @@ PREAMBLE = "0000000000000000000000000000000000000000000000000000000000000006"
 #FFFFFFF000000000 FFFFFE0000000000
 BANANO_WORK = "FFFFFE0000000000"
 
+MESSAGE_PREAMBLE = "62616E616E6F6D73672D" #bananomsg-
+
 #this function translated to python from https://nanoo.tools/js/termhn_nano-base32_2018-03-06.js
 def encode_base32(bytes) -> str:
   alphabet = '13456789abcdefghijkmnopqrstuwxyz'
@@ -66,6 +68,9 @@ def bytes_to_hex(bytes: bytes) -> str:
 def hex_to_bytes(hex: str) -> bytes:
   return bytes.fromhex(hex)
 
+def utf8_to_bytes(message: str):
+  return message.encode()
+
 #bytes_num should be 32, usually
 def random_bytes(bytes_num: int):
   return os.urandom(bytes_num)
@@ -117,8 +122,56 @@ def hash_block(block) -> str:
 def sign(private_key: str, hash: str) -> str:
   #ed25519_blake2b verify
   signing_key = ed25519_blake2b.SigningKey(hex_to_bytes(private_key))
-  sign = bytes_to_hex(signing_key.sign(hex_to_bytes(hash)))
-  return sign
+  signature = bytes_to_hex(signing_key.sign(hex_to_bytes(hash)))
+  return signature
+
+def sign_message(private_key: str, message: str) -> str:
+  signing_key = ed25519_blake2b.SigningKey(hex_to_bytes(private_key))
+  signature = bytes_to_hex(signing_key.sign(utf8_to_bytes(message)))
+  return signature
+
+def verify_message(public_key: str, signature: str, claimed_message: str) -> bool:
+  verifying_key = ed25519_blake2b.VerifyingKey(hex_to_bytes(public_key))
+  try:
+    verifying_key.verify(hex_to_bytes(signature), utf8_to_bytes(claimed_message))
+    return True
+  except:
+    return False
+
+def gen_dummy_block_hash(public_key: str, message: str) -> bytes:
+  dummy_16 = hex_to_bytes("00000000000000000000000000000000")
+  dummy_32 = hex_to_bytes("0000000000000000000000000000000000000000000000000000000000000000")
+  blake_obj = blake2b(digest_size=32)
+  blake_obj.update(hex_to_bytes(PREAMBLE))
+  blake_obj.update(hex_to_bytes(public_key))
+  blake_obj.update(dummy_32)
+  #we are putting the hashed message into the representative field
+  blake_obj_message = blake2b(digest_size=32)
+  blake_obj_message.update(hex_to_bytes(MESSAGE_PREAMBLE))
+  blake_obj_message.update(utf8_to_bytes(message))
+  print("msg", bytes_to_hex(blake_obj_message.digest()))
+  blake_obj.update(blake_obj_message.digest())
+  blake_obj.update(dummy_16)
+  blake_obj.update(dummy_32)
+  #return hash
+  return blake_obj.digest()
+  
+def sign_message_dummy_block(private_key: str, message: str) -> str:
+  signing_key = ed25519_blake2b.SigningKey(hex_to_bytes(private_key))
+  dummy_block_hash = gen_dummy_block_hash(get_public_key_from_private_key(private_key), message)
+  print("abc", bytes_to_hex(dummy_block_hash))
+  #assert bytes_to_hex(dummy_block_hash) == "041E2C42234229B51F21AD6824D557DBAE02A180C9050E6E82021E22D517C6FD"
+  signature = bytes_to_hex(signing_key.sign(dummy_block_hash))
+  return signature
+
+def verify_message_dummy_block(public_key: str, signature: str, claimed_message: str) -> bool:
+  dummy_block_hash = gen_dummy_block_hash(public_key, claimed_message)
+  verifying_key = ed25519_blake2b.VerifyingKey(hex_to_bytes(public_key))
+  try:
+    verifying_key.verify(hex_to_bytes(signature), dummy_block_hash)
+    return True
+  except:
+    return False
 
 def whole_to_raw(whole: str) -> int:
   return int(Decimal(whole)*(10**BANANO_DECIMALS))

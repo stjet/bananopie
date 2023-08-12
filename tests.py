@@ -68,3 +68,25 @@ my_work_account = Wallet(no_work_rpc, seed="3AB019DFCBA0B3763A75B8717EE7900911C7
 my_work_account.receive_all()
 
 my_work_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.0145")
+
+message_signature = my_work_account.sign_message("testing1234")
+
+my_work_public_key = my_work_account.get_public_key()
+
+assert message_signature == "D945708F73E35DA84D3604FF7A9910CD73CE9133B7CB984D0DB50D744BC9C5B46FCBA730DEAA480258BFC1118D6C4635710CF6002C9AFBAADF6BE6CBD526880B"
+
+assert verify_message(my_work_public_key, message_signature, "testing1234")
+
+assert not verify_message(my_work_public_key, message_signature, "testing123")
+
+assert not verify_message(my_work_public_key, message_signature, "weee")
+
+message_signature_dummy_block = my_work_account.sign_message_dummy_block("testing1234")
+
+assert message_signature_dummy_block == "734D535A9BA1ADF53BC47036FDFE6ADFFFE2D28C7DDCA6C05E76CBB8F70CA33E6B23824C91D780E8C23849ADD8566EC258629C8261E7EC438E75B218860D0002"
+
+assert verify_message_dummy_block(my_work_public_key, message_signature_dummy_block, "testing1234")
+
+assert not verify_message_dummy_block(my_work_public_key, message_signature_dummy_block, "testing123")
+
+assert not verify_message_dummy_block(my_work_public_key, message_signature_dummy_block, "weee")
