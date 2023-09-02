@@ -3,7 +3,7 @@ from .util import *
 
 #todo: request work with work_generate
 class Wallet:
-  def __init__(self, rpc: RPC, seed = False, index: int = 0, try_work = False):
+  def __init__(self, rpc: RPC, seed = None, index: int = 0, try_work = False):
     self.rpc = rpc
     #if seed is False, automatically generate new seed
     if not seed:
@@ -36,14 +36,15 @@ class Wallet:
         payload["do_work"] = True
     return self.rpc.call(payload)
   #actions
-  def send(self, to: str, amount: str, work = False):
+  def send(self, to: str, amount: str, work = False, previous = None):
     amount = whole_to_raw(amount)
     address_sender = self.get_address()
     private_key_sender = get_private_key_from_seed(self.seed, self.index)
     #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
     public_key_receiver = get_public_key_from_address(to)
     info = self.get_account_info()
-    previous = info["frontier"]
+    if not previous:
+      previous = info["frontier"]
     representative = info["representative"]
     before_balance = info["balance"]
     #height not actually needed
@@ -63,7 +64,33 @@ class Wallet:
     if work:
       block["work"] = work
     return self.send_process(block, "send")
-  def receive_specific(self, hash: str, work=False):
+  def send_all(self, to: str, work = False, previous = None):
+    address_sender = self.get_address()
+    private_key_sender = get_private_key_from_seed(self.seed, self.index)
+    #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
+    public_key_receiver = get_public_key_from_address(to)
+    info = self.get_account_info()
+    if not previous:
+      previous = info["frontier"]
+    representative = info["representative"]
+    #height not actually needed
+    block = {
+      "type": "state",
+      "account": address_sender,
+      "previous": previous,
+      "representative": representative,
+      "balance": "0",
+      #link in this case is public key of account to send to
+      "link": public_key_receiver,
+      "link_as_account": to
+    }
+    block_hash = hash_block(block)
+    signature = sign(private_key_sender, block_hash)
+    block["signature"] = signature
+    if work:
+      block["work"] = work
+    return self.send_process(block, "send")
+  def receive_specific(self, hash: str, work = False, previous = None):
     #no need to check as opened, I think?
     #get block info of receiving
     block_info = self.rpc.get_block_info(hash)
@@ -71,20 +98,20 @@ class Wallet:
     address_sender = self.get_address()
     private_key_receiver = get_private_key_from_seed(self.seed, self.index)
     #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
-    public_key_sender = get_public_key_from_address(block_info["block_account"])
+    #public_key_sender = get_public_key_from_address(block_info["block_account"])
     #these are the defaults, if the account is unopened
     before_balance = 0
     representative = address_sender
-    previous = "0000000000000000000000000000000000000000000000000000000000000000"
-    try:
-      #if account is opened
-      info = self.get_account_info()
-      previous = info["frontier"]
-      representative = info["representative"]
-      before_balance = info["balance"]
-    except Exception as e:
-      #probably, unopened account
-      pass
+    if not previous:
+      try:
+        #if account is opened
+        info = self.get_account_info()
+        previous = info["frontier"]
+        representative = info["representative"]
+        before_balance = info["balance"]
+      except Exception as e:
+        #probably, unopened account
+        previous = "0000000000000000000000000000000000000000000000000000000000000000"
     #height not actually needed
     block = {
       "type": "state",
@@ -101,26 +128,22 @@ class Wallet:
     if work:
       block["work"] = work
     return self.send_process(block, "receive")
-  def receive_all(self):
-    receivable_blocks = self.get_receivable()["blocks"]
+  def receive_all(self, count=20, threshold=None):
+    responses = []
+    receivable_blocks = self.get_receivable_whole_threshold(count=count, threshold=threshold)["blocks"]
     for block_hash in receivable_blocks:
       #receive them
-      self.receive_specific(block_hash)
-  def change_rep(self, new_representative, work=False):
+      responses.append(self.receive_specific(block_hash))
+    return responses
+  def change_rep(self, new_representative, work = False, previous = None):
     address_self = self.get_address()
     private_key_self = get_private_key_from_seed(self.seed, self.index)
     #public_key_sender = get_public_key_from_private_key(get_private_key_from_seed(self.seed, self.index))
-    #these are the defaults, if the account is unopened
-    before_balance = 0
-    previous = "0000000000000000000000000000000000000000000000000000000000000000"
-    try:
-      #if account is opened
-      info = self.get_account_info()
+    #account must be opened to do a change rep
+    info = self.get_account_info()
+    if not previous:
       previous = info["frontier"]
-      before_balance = info["balance"]
-    except Exception as e:
-      #probably, unopened account
-      pass
+    before_balance = info["balance"]
     block = {
       "type": "state",
       "account": address_self,
@@ -145,9 +168,13 @@ class Wallet:
   #double wrapped
   def get_balance(self):
     return self.rpc.get_account_balance(self.get_address())
-  def get_receivable(self):
-    return self.rpc.get_receivable(self.get_address())
+  def get_receivable(self, count: int = 20, threshold = None):
+    return self.rpc.get_receivable(self.get_address(), count=count, threshold=threshold)
+  def get_receivable_whole_threshold(self, count: int = 20, threshold = None):
+    return self.rpc.get_receivable(self.get_address(), count=count, threshold=whole_to_raw(str(threshold)))
   def get_representative(self):
     return self.rpc.get_account_representative(self.get_address())
   def get_account_info(self):
     return self.rpc.get_account_info(self.get_address())
+  def get_account_history(self, count: int = -1, head: str = None, account_filter: list[str] = None):
+    return self.rpc.get_account_history(self.get_address(), count=count, head=head, account_filter=account_filter)

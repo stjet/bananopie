@@ -137,7 +137,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#block_info)
 Get blocks.
 
 **Parameters**
-- `blocks` (*str list*): List of block hashes to get information on
+- `blocks` (*list[str]*): List of block hashes to get information on
 
 **Returns:**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#blocks)
@@ -146,7 +146,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#blocks)
 Get blocks, with more detailed information.
 
 **Parameters**
-- `blocks` (*str list*): List of block hashes to get information on
+- `blocks` (*list[str]*): List of block hashes to get information on
 
 **Returns:**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#blocks_info)
@@ -175,6 +175,8 @@ Get account history (confirmed and received transaction list)
 **Parameters**
 - `account` (*str*): Address of account
 - `count` (*int*, Default: -1): Optional parameter to specify amount of transactions to return. `-1` means all, or at least as much as the node will allow
+- `head` (*str* or *None*, Default: None): Block hash to start from, defaults to latest block hash if omitted
+- `account_filter` (*list[str]* or *None*, Default: None): List of addresses to only show sends/receives from. Please note that some public nodes will ignore this parameter
 
 **Returns:**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#account_history)
@@ -210,7 +212,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#account_represe
 Get representatives of accounts
 
 **Parameters**
-- `account` (*str list*): List of addresses
+- `account` (*list[str]*): List of addresses
 
 **Returns:**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#account_representatives)
@@ -230,7 +232,7 @@ Get receivable transactions for account
 **Parameters**
 - `account` (*str*): Address of representative
 - `count` (*int*, Default: 20): Optional parameter to specify max amount of receivable transactions to return
-- `thereshold` (*int or bool*, Default: False): Optional parameter to filter out any receivable transactions with value less than the thereshold
+- `threshold` (*int* or *None*, Default: None): Optional parameter to filter out any receivable transactions with value below the threshold (in raw)
 
 **Returns:**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#receivable)
@@ -239,7 +241,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#receivable)
 
 **Parameters:**
 - `rpc` (*RPC*): A RPC class
-- `seed` (*str* or *bool*, Default: False): 64 character hex seed, if `False`, will generate a seed by itself. Private keys are derived from the seed.
+- `seed` (*str* or *None*, Default: None): 64 character hex seed, if `None`, will generate a seed by itself. Private keys are derived from the seed.
 - `index` (*int*, Default: 0): Optional parameter that is the index of the seed. Any number from 0 to 4294967295. Each index of the seed is a different private key, and so different address.
 - `try_work` (*bool*, Default: False): If `True`, will try to generate work locally instead of asking node for work (and no work provided). Good to use if node does not support generating own work.
 
@@ -272,11 +274,29 @@ High level function to send Banano
 - `to` (*str*): Address to send to
 - `amount` (*str*): Amount of Banano to send (in whole, not raw)
 - `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 Sample:
 ```py
 my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1")
+```
+
+**Returns**
+See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process)
+
+### send_all (Function)
+High level function to send all Banano
+
+**Parameters**
+- `to` (*str*): Address to send to
+- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
+
+Sample:
+```py
+my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account.send_all("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94")
 ```
 
 **Returns**
@@ -288,6 +308,7 @@ Receive a specific block
 **Parameters**
 - `hash` (*str*): Block hash to receive
 - `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 **Returns**
 See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process)
@@ -296,7 +317,8 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process)
 Receive all (technically, 20) receivable transactions
 
 **Parameters**
-None
+- `count` (*int*, Default: 20): Optional parameter to specify max amount of receivable transactions to receive
+- `threshold` (*int* or *None*, Default: None): Optional parameter to not receive any receivable transactions with value below the threshold (in whole, not raw)
 
 Sample:
 ```py
@@ -305,7 +327,7 @@ my_account.receive_all()
 ```
 
 **Returns**
-Nothing
+- A list of block hashes that were received (See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#process))
 
 ### change_rep (Function)
 Change account representative
@@ -313,6 +335,7 @@ Change account representative
 **Parameters**
 - `new_representative` (*str*): Representative Banano address to change to
 - `work` (*str* or *bool*, Default: False): Leave it as False to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 Sample:
 ```py
@@ -365,11 +388,17 @@ Double wrapped function to get balance of self (see `RPC`'s `get_account_balance
 ### get_receivable (Function)
 Double wrapped function to get receivable blocks (see `RPC`'s `get_receivable`)
 
+### get_receivable_whole_threshold (Function)
+Double wrapped function to get receivable blocks (see `RPC`'s `get_receivable`), except `threshold` parameter is in whole Banano, not raw
+
 ### get_representative (Function)
 Double wrapped function to get representative of self (see `RPC`'s `get_account_representative`)
 
 ### get_account_info (Function)
 Double wrapped function to get account info of self (see `RPC`'s `get_account_info`)
+
+### get_account_history (Function)
+Double wrapped function to get account info of self (see `RPC`'s `get_account_history`)
 
 ### generate_seed (static Function)
 Generate a random seed using `os.urandom`

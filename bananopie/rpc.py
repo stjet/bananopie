@@ -25,17 +25,27 @@ class RPC:
     return self.call({"action": "block_count"})
   def get_block_info(self, block: str):
     return self.call({"action": "block_info", "hash": block, "json_block": "true"})
-  def get_blocks(self, blocks):
+  def get_blocks(self, blocks: list[str]):
     return self.call({"action": "blocks", "hashes": blocks, "json_block": "true"})
-  def get_blocks_info(self, blocks):
+  def get_blocks_info(self, blocks: list[str]):
     return self.call({"action": "blocks_info", "hashes": blocks, "json_block": "true"})
   def get_representatives(self):
     return self.call({"action": "representatives"})
   def get_representatives_online(self):
     return self.call({"action": "representatives_online"})
   """Account Informational RPC calls"""
-  def get_account_history(self, account: str, count: int = -1):
-    return self.call({"action": "account_history", "account": account, "count": str(count)})
+  def get_account_history(self, account: str, count: int = -1, head: str = None, account_filter: list[str] = None):
+    payload = {
+      "action": "account_history",
+      "account": account,
+      "count": str(count)
+    }
+    if head:
+      payload["head"] = head
+    if account_filter:
+      payload["account_filter"] = account_filter
+    print(payload)
+    return self.call(payload)
   def get_account_info(self, account: str):
     return self.call({"action": "account_info", "account": account, "representative": "true"})
   def get_account_balance(self, account: str):
@@ -46,7 +56,7 @@ class RPC:
     return self.call({"action": "account_representatives", "accounts": accounts})
   def get_account_weight(self, account: str):
     return self.call({"action": "account_weight", "account": account})
-  def get_receivable(self, account: str, count: int = 20, threshold = False):
+  def get_receivable(self, account: str, count: int = 20, threshold = None):
     action_name = "receivable"
     if self.legacy:
       action_name = "pending"
