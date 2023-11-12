@@ -25,16 +25,16 @@ class RPC:
     return self.call({"action": "block_count"})
   def get_block_info(self, block: str):
     return self.call({"action": "block_info", "hash": block, "json_block": "true"})
-  def get_blocks(self, blocks: list[str]):
+  def get_blocks(self, blocks): #blocks: list[str]
     return self.call({"action": "blocks", "hashes": blocks, "json_block": "true"})
-  def get_blocks_info(self, blocks: list[str]):
+  def get_blocks_info(self, blocks): #blocks: list[str]
     return self.call({"action": "blocks_info", "hashes": blocks, "json_block": "true"})
   def get_representatives(self):
     return self.call({"action": "representatives"})
   def get_representatives_online(self):
     return self.call({"action": "representatives_online"})
   """Account Informational RPC calls"""
-  def get_account_history(self, account: str, count: int = -1, head: str = None, account_filter: list[str] = None):
+  def get_account_history(self, account: str, count: int = -1, head: str = None, account_filter = None): #account_filter: list[str] = None
     payload = {
       "action": "account_history",
       "account": account,

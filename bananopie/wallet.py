@@ -48,12 +48,15 @@ class Wallet:
     representative = info["representative"]
     before_balance = info["balance"]
     #height not actually needed
+    new_balance = int(int(before_balance)-amount)
+    if new_balance < 0:
+      raise ValueError(f"Insufficient funds to send. Cannot send more than balance (before balance {str(before_balance)} less than send amount {str(amount)})")
     block = {
       "type": "state",
       "account": address_sender,
       "previous": previous,
       "representative": representative,
-      "balance": str(int(int(before_balance)-amount)),
+      "balance": str(new_balance),
       #link in this case is public key of account to send to
       "link": public_key_receiver,
       "link_as_account": to
@@ -171,7 +174,10 @@ class Wallet:
   def get_receivable(self, count: int = 20, threshold = None):
     return self.rpc.get_receivable(self.get_address(), count=count, threshold=threshold)
   def get_receivable_whole_threshold(self, count: int = 20, threshold = None):
-    return self.rpc.get_receivable(self.get_address(), count=count, threshold=whole_to_raw(str(threshold)))
+    if threshold == None:
+      return self.rpc.get_receivable(self.get_address(), count=count)
+    else:
+      return self.rpc.get_receivable(self.get_address(), count=count, threshold=whole_to_raw(str(threshold)))
   def get_representative(self):
     return self.rpc.get_account_representative(self.get_address())
   def get_account_info(self):

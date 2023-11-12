@@ -8,6 +8,10 @@ Bananopie is a python library for the Banano cryptocurrency. It aims to be the p
 
 Bananopie is on [pypi](https://pypi.org/project/bananopie/).
 
+## Notes
+- There is an outdated fork of Bananopie for Nano, also made by me, called [nanohakase](https://pypi.org/project/nanohakase/). It should suit most of your needs, but if you need new Bananopie features, fork Bananopie, change the work difficulty to `FFFFFFF800000000`, decimals to `31`, and you should be good to go.
+- When running on Replit (ew), installing Bananopie may fail if you do not have `gcc` installed (nix package: `libgccjit`).
+
 # Quick Start
 
 First, start with a `RPC` class, for read only 
@@ -457,10 +461,11 @@ Converts whole Banano to raw Banano
 *int*, that is raw amount of Banano
 
 ### raw_to_whole (Function)
-Converts raw Banano to whole Banano (Cuts off at 2 decimal places)
+Converts raw Banano to whole Banano (Cuts off at 2 decimal places by default)
 
 **Parameters**
 - `raw` (*int*): Raw amount of Banano
+- `precision` (*int*, Default: 2): Decimal places to cut off at
 
 **Returns**
 *int*, that is whole amount of Banano

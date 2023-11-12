@@ -66,6 +66,7 @@ def bytes_to_hex(bytes: bytes) -> str:
   return bytes.hex().upper()
 
 def hex_to_bytes(hex: str) -> bytes:
+  #seems to return big endian
   return bytes.fromhex(hex)
 
 def utf8_to_bytes(message: str):
@@ -79,7 +80,7 @@ def get_private_key_from_seed(seed: str, seed_index: int) -> str:
   #https://docs.nano.org/glossary/#wallet
   #seed_index is 32 bit (4 bytes)
   #use hashlib blake2b
-  seed_index = seed_index.to_bytes(4, 'big')
+  seed_index = seed_index.to_bytes(4, "big")
   seed = hex_to_bytes(seed)
   blake_obj = blake2b(digest_size=32)
   blake_obj.update(seed)
@@ -149,7 +150,6 @@ def gen_dummy_block_hash(public_key: str, message: str) -> bytes:
   blake_obj_message = blake2b(digest_size=32)
   blake_obj_message.update(hex_to_bytes(MESSAGE_PREAMBLE))
   blake_obj_message.update(utf8_to_bytes(message))
-  print("msg", bytes_to_hex(blake_obj_message.digest()))
   blake_obj.update(blake_obj_message.digest())
   blake_obj.update(dummy_16)
   blake_obj.update(dummy_32)
@@ -159,7 +159,6 @@ def gen_dummy_block_hash(public_key: str, message: str) -> bytes:
 def sign_message_dummy_block(private_key: str, message: str) -> str:
   signing_key = ed25519_blake2b.SigningKey(hex_to_bytes(private_key))
   dummy_block_hash = gen_dummy_block_hash(get_public_key_from_private_key(private_key), message)
-  print("abc", bytes_to_hex(dummy_block_hash))
   #assert bytes_to_hex(dummy_block_hash) == "041E2C42234229B51F21AD6824D557DBAE02A180C9050E6E82021E22D517C6FD"
   signature = bytes_to_hex(signing_key.sign(dummy_block_hash))
   return signature
@@ -176,8 +175,8 @@ def verify_message_dummy_block(public_key: str, signature: str, claimed_message:
 def whole_to_raw(whole: str) -> int:
   return int(Decimal(whole)*(10**BANANO_DECIMALS))
 
-def raw_to_whole(raw: int) -> int:
-  return math.floor((raw*100)/(10**BANANO_DECIMALS))/100
+def raw_to_whole(raw: int, precision: int = 2):
+  return math.floor((raw*(10**precision))/(10**BANANO_DECIMALS))/(10**precision)
 
 def raw_to_whole_no_round(raw: int) -> str:
   return str(Decimal(raw)/Decimal(10**BANANO_DECIMALS))
@@ -194,7 +193,9 @@ def gen_work_random(hash: str, threshold: str) -> str:
     blake_obj = blake2b(digest_size=8)
     blake_obj.update(nonce)
     blake_obj.update(hex_to_bytes(hash))
-    if int.from_bytes(blake_obj.digest(), byteorder='little') >= int.from_bytes(hex_to_bytes(threshold), byteorder='big'):
+    #since hex_to_bytes returns big endian, for BANANO_WORK, after we convert to hex, we convert to bytes with big endian
+    if int.from_bytes(blake_obj.digest(), byteorder="little") > int.from_bytes(hex_to_bytes(threshold), byteorder="big"):
+      #return as big endian
       return bytes_to_hex(bytearray.fromhex(bytes_to_hex(nonce))[::-1])
 
 def gen_work_deterministic(hash: str, threshold: str) -> str:
@@ -202,11 +203,13 @@ def gen_work_deterministic(hash: str, threshold: str) -> str:
   nonce = 0
   while True:
     #when blake2b hashed with the hash, should be larger than the threshold
-    nonce_bytes = nonce.to_bytes(8, byteorder="big")
+    nonce_bytes = nonce.to_bytes(8, byteorder="little")
     blake_obj = blake2b(digest_size=8)
     blake_obj.update(nonce_bytes)
     blake_obj.update(hex_to_bytes(hash))
-    if int.from_bytes(blake_obj.digest(), byteorder='little') >= int.from_bytes(hex_to_bytes(threshold), byteorder='big'):
+    #since hex_to_bytes returns big endian, for BANANO_WORK, after we convert to hex, we convert to bytes with big endian
+    if int.from_bytes(blake_obj.digest(), byteorder="little") > int.from_bytes(hex_to_bytes(threshold), byteorder="big"):
+      #return as big endian
       return bytes_to_hex(bytearray.fromhex(bytes_to_hex(nonce_bytes))[::-1])
     nonce += 1
 
@@ -217,7 +220,7 @@ def verify_work(hash: str, work: str) -> bool:
   blake_obj = blake2b(digest_size=8)
   blake_obj.update(bytearray.fromhex(work)[::-1])
   blake_obj.update(hex_to_bytes(hash))
-  if int.from_bytes(blake_obj.digest(), byteorder='little') >= int.from_bytes(hex_to_bytes(BANANO_WORK), byteorder='big'):
+  if int.from_bytes(blake_obj.digest(), byteorder="little") > int.from_bytes(hex_to_bytes(BANANO_WORK), byteorder="big"):
     return True
   else:
     return False

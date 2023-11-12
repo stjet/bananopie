@@ -27,6 +27,8 @@ print(raw_to_whole(int(rpc.get_account_balance("ban_1jung1eb3uomk1gsx7w6w7toqrik
 
 assert whole_to_raw("492.2") == 49220000000000000000000000000000
 assert raw_to_whole(15*(10**BANANO_DECIMALS)) == 15.0
+assert raw_to_whole(15.111*(10**BANANO_DECIMALS)) == 15.11
+assert raw_to_whole(15.111*(10**BANANO_DECIMALS), precision=3) == 15.111
 
 #if someone drains the funds in this test seed I will be very upset >:(
 print("Wallets test")
@@ -70,6 +72,8 @@ no_work_rpc = RPC("https://public.node.jungletv.live/rpc", legacy=True)
 #print(no_work_rpc.get_receivable("ban_1mayorbance1ot1sburnedbananas11111111111111111111111zsqrpxj1", count = 1))
 
 #gen_work
+
+assert gen_work("B7FBEF33567E37E04E772C473CCED4FA9245CC7A4C1BDE8A2576F7384E7919E1") == "0000000000423B3B"
 
 assert verify_work("C6A3732E65800203CE0F32DE710CC110A0CA93C0080F5F0C84A352978DB285F9", "58C5C876832364CC") == True
 
