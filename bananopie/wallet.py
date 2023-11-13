@@ -182,5 +182,5 @@ class Wallet:
     return self.rpc.get_account_representative(self.get_address())
   def get_account_info(self):
     return self.rpc.get_account_info(self.get_address())
-  def get_account_history(self, count: int = -1, head: str = None, account_filter: list[str] = None):
+  def get_account_history(self, count: int = -1, head: str = None, account_filter = None): #account_filter: list[str] = None
     return self.rpc.get_account_history(self.get_address(), count=count, head=head, account_filter=account_filter)

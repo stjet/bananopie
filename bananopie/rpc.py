@@ -52,7 +52,7 @@ class RPC:
     return self.call({"action": "account_balance", "account": account})
   def get_account_representative(self, account: str):
     return self.call({"action": "account_representative", "account": account})
-  def get_accounts_representatives(self, accounts):
+  def get_accounts_representatives(self, accounts): #accounts: list[str]
     return self.call({"action": "account_representatives", "accounts": accounts})
   def get_account_weight(self, account: str):
     return self.call({"action": "account_weight", "account": account})
