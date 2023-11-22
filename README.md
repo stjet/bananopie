@@ -48,7 +48,7 @@ print(my_account.get_address())
 print(my_account.get_balance())
 
 #send 1 banano to the faucet development fund
-print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1"))
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1")["hash"])
 
 #receive funds
 my_account.receive_all()
@@ -251,7 +251,7 @@ See [Nano RPC Docs](https://docs.nano.org/commands/rpc-protocol/#receivable)
 
 Sample:
 ```py
-my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 ```
 
 **Properties:**
@@ -282,7 +282,7 @@ High level function to send Banano
 
 Sample:
 ```py
-my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "1")
 ```
 
@@ -299,7 +299,7 @@ High level function to send all Banano
 
 Sample:
 ```py
-my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 my_account.send_all("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94")
 ```
 
@@ -326,7 +326,7 @@ Receive all (technically, 20) receivable transactions
 
 Sample:
 ```py
-my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 my_account.receive_all()
 ```
 
@@ -343,7 +343,7 @@ Change account representative
 
 Sample:
 ```py
-my_wallet = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
+my_account = Wallet(RPC("https://kaliumapi.appditto.com/api"), "seed here", 0)
 my_account.change_rep("ban_3catgir1p6b1edo5trp7fdb8gsxx4y5ffshbphj73zzy5hu678rsry7srh8b")
 ```
 

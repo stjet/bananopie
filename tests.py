@@ -51,7 +51,7 @@ print(my_account.receive_all())
 
 #send 1 banano to the faucet development fund
 print("Send test")
-print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.1"))
+print(my_account.send("ban_3pdripjhteyymwjnaspc5nd96gyxgcdxcskiwwwoqxttnrncrxi974riid94", "0.1")["hash"])
 
 #change rep
 print("Change test")
