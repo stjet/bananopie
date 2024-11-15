@@ -34,7 +34,7 @@ class RPC:
   def get_representatives_online(self):
     return self.call({"action": "representatives_online"})
   """Account Informational RPC calls"""
-  def get_account_history(self, account: str, count: int = -1, head: str = None, account_filter = None): #account_filter: list[str] = None
+  def get_account_history(self, account: str, count: int = -1, head: str = None, account_filter = None, raw: bool = None, reverse: bool = None): #account_filter: list[str] = None
     payload = {
       "action": "account_history",
       "account": account,
@@ -44,7 +44,10 @@ class RPC:
       payload["head"] = head
     if account_filter:
       payload["account_filter"] = account_filter
-    print(payload)
+    if raw:
+      payload["raw"] = raw
+    if reverse:
+      payload["reverse"] = reverse
     return self.call(payload)
   def get_account_info(self, account: str):
     return self.call({"action": "account_info", "account": account, "representative": "true"})
