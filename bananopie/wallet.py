@@ -66,7 +66,10 @@ class Wallet:
     block["signature"] = signature
     if work:
       if callable(work):
-        work = work(block_hash)
+        if block["previous"] == "0000000000000000000000000000000000000000000000000000000000000000":
+          work = work(self.get_public_key())
+        else:
+          work = work(block["previous"])
       block["work"] = work
     return self.send_process(block, "send")
   def send_all(self, to: str, work = False, previous = None):
@@ -94,7 +97,10 @@ class Wallet:
     block["signature"] = signature
     if work:
       if callable(work):
-        work = work(block_hash)
+        if block["previous"] == "0000000000000000000000000000000000000000000000000000000000000000":
+          work = work(self.get_public_key())
+        else:
+          work = work(block["previous"])
       block["work"] = work
     return self.send_process(block, "send")
   def receive_specific(self, hash: str, work = False, previous = None):
@@ -134,7 +140,10 @@ class Wallet:
     block["signature"] = signature
     if work:
       if callable(work):
-        work = work(block_hash)
+        if block["previous"] == "0000000000000000000000000000000000000000000000000000000000000000":
+          work = work(self.get_public_key())
+        else:
+          work = work(block["previous"])
       block["work"] = work
     return self.send_process(block, "receive")
   def receive_all(self, count=20, threshold=None):
@@ -167,7 +176,10 @@ class Wallet:
     block["signature"] = signature
     if work:
       if callable(work):
-        work = work(block_hash)
+        if block["previous"] == "0000000000000000000000000000000000000000000000000000000000000000":
+          work = work(self.get_public_key())
+        else:
+          work = work(block["previous"])
       block["work"] = work
     return self.send_process(block, "change")
   def sign_message(self, message: str) -> str:
