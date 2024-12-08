@@ -65,6 +65,8 @@ class Wallet:
     signature = sign(private_key_sender, block_hash)
     block["signature"] = signature
     if work:
+      if callable(work):
+        work = work(block_hash)
       block["work"] = work
     return self.send_process(block, "send")
   def send_all(self, to: str, work = False, previous = None):
@@ -91,6 +93,8 @@ class Wallet:
     signature = sign(private_key_sender, block_hash)
     block["signature"] = signature
     if work:
+      if callable(work):
+        work = work(block_hash)
       block["work"] = work
     return self.send_process(block, "send")
   def receive_specific(self, hash: str, work = False, previous = None):
@@ -129,6 +133,8 @@ class Wallet:
     signature = sign(private_key_receiver, block_hash)
     block["signature"] = signature
     if work:
+      if callable(work):
+        work = work(block_hash)
       block["work"] = work
     return self.send_process(block, "receive")
   def receive_all(self, count=20, threshold=None):
@@ -160,6 +166,8 @@ class Wallet:
     signature = sign(private_key_self, block_hash)
     block["signature"] = signature
     if work:
+      if callable(work):
+        work = work(block_hash)
       block["work"] = work
     return self.send_process(block, "change")
   def sign_message(self, message: str) -> str:

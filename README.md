@@ -277,7 +277,7 @@ High level function to send Banano
 **Parameters**
 - `to` (*str*): Address to send to
 - `amount` (*str*): Amount of Banano to send (in whole, not raw)
-- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool* or *function*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally, if it is a function, the work will be the function called with the block hash as a parameter (keep in mind you can set the class' `try_work` to `True` to use the built-in `gen_work` function)
 - `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 Sample:
@@ -294,7 +294,7 @@ High level function to send all Banano
 
 **Parameters**
 - `to` (*str*): Address to send to
-- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool* or *function*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally, if it is a function, the work will be the function called with the block hash as a parameter (keep in mind you can set the class' `try_work` to `True` to use the built-in `gen_work` function)
 - `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 Sample:
@@ -311,7 +311,7 @@ Receive a specific block
 
 **Parameters**
 - `hash` (*str*): Block hash to receive
-- `work` (*str* or *bool*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool* or *function*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally, if it is a function, the work will be the function called with the block hash as a parameter (keep in mind you can set the class' `try_work` to `True` to use the built-in `gen_work` function)
 - `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 **Returns**
@@ -338,7 +338,7 @@ Change account representative
 
 **Parameters**
 - `new_representative` (*str*): Representative Banano address to change to
-- `work` (*str* or *bool*, Default: False): Leave it as False to ask node to generate work (passes `do_work`). Put in a work string if work generated locally
+- `work` (*str* or *bool* or *function*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). Put in a work string if work generated locally, if it is a function, the work will be the function called with the block hash as a parameter (keep in mind you can set the class' `try_work` to `True` to use the built-in `gen_work` function)
 - `previous` (*str* or *None*, Default: None): Previous block hash. Otherwise, address' frontier block hash used
 
 Sample:
