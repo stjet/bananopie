@@ -323,6 +323,7 @@ Receive all (technically, 20) receivable transactions
 **Parameters**
 - `count` (*int*, Default: 20): Optional parameter to specify max amount of receivable transactions to receive
 - `threshold` (*int* or *None*, Default: None): Optional parameter to not receive any receivable transactions with value below the threshold (in whole, not raw)
+- `work` (*bool* or *function*, Default: False): Leave it as `False` to ask node to generate work (passes `do_work`). If it is a function, the work will be the function called with the block hash as a parameter (keep in mind you can set the class' `try_work` to `True` to use the built-in `gen_work` function)
 
 Sample:
 ```py
