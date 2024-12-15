@@ -146,12 +146,12 @@ class Wallet:
           work = work(block["previous"])
       block["work"] = work
     return self.send_process(block, "receive")
-  def receive_all(self, count=20, threshold=None):
+  def receive_all(self, count=20, threshold=None, work=False):
     responses = []
     receivable_blocks = self.get_receivable_whole_threshold(count=count, threshold=threshold)["blocks"]
     for block_hash in receivable_blocks:
       #receive them
-      responses.append(self.receive_specific(block_hash))
+      responses.append(self.receive_specific(block_hash, work=work))
     return responses
   def change_rep(self, new_representative, work = False, previous = None):
     address_self = self.get_address()
